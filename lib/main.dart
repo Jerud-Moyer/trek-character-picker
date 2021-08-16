@@ -6,6 +6,7 @@ import 'character.dart';
 import 'question_widget.dart';
 import 'answers_2.dart';
 import 'answers_3.dart';
+import 'answers_4.dart';
 import 'dart:math';
 
 
@@ -28,6 +29,7 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
   String dropdownValue_1 = answers_1[0].value;
   String dropdownValue_2 = answers_2[0].value;
   String dropdownValue_3 = answers_3[0].value;
+  String dropdownValue_4 = answers_4[0].value;
 
   @override
   Widget build(BuildContext ctx) {
@@ -45,7 +47,9 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(ctx, CharacterPage(dropdownValue_2));
+            Navigator.push(ctx, CharacterPage(
+                [dropdownValue_1, dropdownValue_2, dropdownValue_3, dropdownValue_4]
+            ));
           },
           child: Icon(Icons.arrow_right,
             color: Colors.amber,
@@ -93,18 +97,17 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
                       }
                     ),
                     QuestionWidget(
-                        question: 'Two sides of your family have a political disagreement. What do you do?',
-                        answers: answers_3,
-                        selectedValue: dropdownValue_3,
+                        question: 'Media reports are speaking of a frightening new virus. What\'s your reaction?',
+                        answers: answers_4,
+                        selectedValue: dropdownValue_4,
                         onChange: (String? newValue) {
                           setState(() {
-                            dropdownValue_3 = newValue!;
-                            print(dropdownValue_3);
+                            dropdownValue_4 = newValue!;
                           });
                         }
                     ),
                     SizedBox(
-                      height: 50,
+                      height: 75,
                     )
                   ]),
             )
@@ -114,7 +117,34 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
   }
 
 class CharacterPage extends MaterialPageRoute<Null> {
-  CharacterPage(affiliation) : super(builder: (BuildContext ctx) {
+  CharacterPage(affiliations) : super(builder: (BuildContext ctx) {
+    int klingons = 0;
+    int federations = 0;
+    int starfleets = 0;
+    int romulans = 0;
+    int rogues = 0;
+
+    affiliations.forEach((word) => {
+      if(word == 'klingon') {klingons += 1},
+      if(word == 'federation') {federations += 1},
+      if(word == 'starfleet') {starfleets += 1},
+      if(word == 'romulan') {romulans += 1},
+      if(word == 'rogue') {rogues += 1}
+    });
+
+    List<Map<String, dynamic>> affiliationCounts = [
+      {'name' : 'klingon', 'amt' : klingons},
+      {'name' : 'federation', 'amt' : federations},
+      {'name' : 'starfleet', 'amt' : starfleets},
+      {'name' : 'romulan', 'amt' : romulans},
+      {'name' : 'rogue', 'amt' : rogues}
+    ];
+
+    affiliationCounts.sort((a, b) => b['amt'] - a['amt']);
+
+    final affiliation = affiliationCounts[0]['name'];
+
+    print(affiliations);
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Colors.grey[800],
@@ -163,6 +193,19 @@ class CharacterPage extends MaterialPageRoute<Null> {
   });
 }
 
+
+
+// selectAffiliation(affiliations) {
+//   final thing =  affiliations.sort((a, b) =>
+//     affiliations.where((str) => str == a).length - affiliations.where((str) => str == b).length
+//   )[affiliations.length - 1];
+//   print(thing);
+//   return thing;
+// }
+
+// String selectAffiliation = (List<String> arr) {
+//
+// }
 
 Future<Character> fetchCharacter(affiliation) async {
   final response = await http
