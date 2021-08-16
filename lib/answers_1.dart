@@ -1,9 +1,13 @@
 import './questionItem.dart';
 
-List<QuestionItem> affiliations = [
+List<QuestionItem> answers_1 = [
   QuestionItem(
-    answer: 'Loyal to a fault, trustworthy, and curious.',
+    answer: 'Extremely loyal, trustworthy, and curious.',
     value: 'starfleet'
+  ),
+  QuestionItem(
+    answer: 'Like a space age Adventure Scout, you always do the right thing!',
+    value: 'federation'
   ),
   QuestionItem(
     answer: 'Short tempered. Strong sense of right and wrong.',

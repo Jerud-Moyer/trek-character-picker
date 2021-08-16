@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'questionItem.dart';
-import 'affiliations.dart';
+import 'answers_1.dart';
 import 'character.dart';
+import 'question_widget.dart';
+import 'answers_2.dart';
+import 'answers_3.dart';
 import 'dart:math';
 
 
@@ -23,7 +25,9 @@ class TrekCharacterPicker extends StatefulWidget {
 
 class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
 
-  String dropdownValue = affiliations[0].value;
+  String dropdownValue_1 = answers_1[0].value;
+  String dropdownValue_2 = answers_2[0].value;
+  String dropdownValue_3 = answers_3[0].value;
 
   @override
   Widget build(BuildContext ctx) {
@@ -41,7 +45,7 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(ctx, CharacterPage(dropdownValue));
+            Navigator.push(ctx, CharacterPage(dropdownValue_2));
           },
           child: Icon(Icons.arrow_right,
             color: Colors.amber,
@@ -51,46 +55,60 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
         ),
         body: Padding(
             padding: EdgeInsets.fromLTRB(30, 40, 30, 0),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                      'Which best describes you?',
-                      style: TextStyle(
-                        color: Colors.lightBlueAccent[700],
-                        fontSize: 24,
-                      )
-                  ),
-                  DropdownButton<String>(
-                    isExpanded: true,
-                    value: dropdownValue,
-                    icon: Icon(Icons.arrow_downward, color: Colors.grey[800],
-                        size: 24),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        dropdownValue = newValue!;
-                        print(dropdownValue);
-                      });
-                    },
-                    items: affiliations
-                        .map<DropdownMenuItem<String>>((
-                        QuestionItem affiliation) {
-                      return DropdownMenuItem<String>(
-                          value: affiliation.value,
-                          child: Text(
-                            affiliation.answer,
-
-                          ));
-                    }).toList(),
-                    hint: Text(
-                        'Which best describes you?',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                        )
+            child: SingleChildScrollView(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    QuestionWidget(
+                      question: 'Which best describes you?',
+                      answers: answers_1,
+                      selectedValue: dropdownValue_1,
+                      onChange: (String? newValue) {
+                        setState(() {
+                          dropdownValue_1 = newValue!;
+                          print(dropdownValue_1);
+                       });
+                      }
                     ),
-                  ),
-                ])),
+                    QuestionWidget(
+                      question: 'A drunken stranger hurls insults at you, how do you respond?',
+                      answers: answers_2,
+                      selectedValue: dropdownValue_2,
+                      onChange: (String? newValue) {
+                        setState(() {
+                          dropdownValue_2 = newValue!;
+                          print(dropdownValue_2);
+                        });
+                      }
+                    ),
+                    QuestionWidget(
+                      question: 'Two sides of your family have a political disagreement. What do you do?',
+                      answers: answers_3,
+                      selectedValue: dropdownValue_3,
+                      onChange: (String? newValue) {
+                        setState(() {
+                          dropdownValue_3 = newValue!;
+                          print(dropdownValue_3);
+                        });
+                      }
+                    ),
+                    QuestionWidget(
+                        question: 'Two sides of your family have a political disagreement. What do you do?',
+                        answers: answers_3,
+                        selectedValue: dropdownValue_3,
+                        onChange: (String? newValue) {
+                          setState(() {
+                            dropdownValue_3 = newValue!;
+                            print(dropdownValue_3);
+                          });
+                        }
+                    ),
+                    SizedBox(
+                      height: 50,
+                    )
+                  ]),
+            )
+        ),
     );
   }
   }
@@ -101,14 +119,7 @@ class CharacterPage extends MaterialPageRoute<Null> {
         appBar: AppBar(
             backgroundColor: Colors.grey[800],
             elevation: 10,
-            actions: <Widget>[
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                },
-                icon: Icon(Icons.close),
-              )
-            ]
+
         ),
         body: Center(
           child: FutureBuilder<Character>(
