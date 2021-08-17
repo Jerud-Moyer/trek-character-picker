@@ -1,4 +1,4 @@
-import 'questionItem.dart';
+import '../questionItem.dart';
 
 List<QuestionItem> answers_3 = [
   QuestionItem(

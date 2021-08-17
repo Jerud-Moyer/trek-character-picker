@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'answers_1.dart';
+import 'dart:math';
+import 'answers/answers_1.dart';
 import 'character.dart';
 import 'question_widget.dart';
-import 'answers_2.dart';
-import 'answers_3.dart';
-import 'answers_4.dart';
-import 'dart:math';
-
+import 'answers/answers_2.dart';
+import 'answers/answers_3.dart';
+import 'answers/answers_4.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -70,7 +69,6 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
                       onChange: (String? newValue) {
                         setState(() {
                           dropdownValue_1 = newValue!;
-                          print(dropdownValue_1);
                        });
                       }
                     ),
@@ -81,7 +79,6 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
                       onChange: (String? newValue) {
                         setState(() {
                           dropdownValue_2 = newValue!;
-                          print(dropdownValue_2);
                         });
                       }
                     ),
@@ -92,7 +89,6 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
                       onChange: (String? newValue) {
                         setState(() {
                           dropdownValue_3 = newValue!;
-                          print(dropdownValue_3);
                         });
                       }
                     ),
@@ -140,16 +136,16 @@ class CharacterPage extends MaterialPageRoute<Null> {
       {'name' : 'rogue', 'amt' : rogues}
     ];
 
+    affiliationCounts.shuffle();
     affiliationCounts.sort((a, b) => b['amt'] - a['amt']);
 
     final affiliation = affiliationCounts[0]['name'];
 
-    print(affiliations);
     return Scaffold(
+        backgroundColor: Colors.grey[850],
         appBar: AppBar(
             backgroundColor: Colors.grey[800],
             elevation: 10,
-
         ),
         body: Center(
           child: FutureBuilder<Character>(
@@ -157,8 +153,23 @@ class CharacterPage extends MaterialPageRoute<Null> {
             builder: (ctx, snapshot){
               if(snapshot.hasData){
                 final character = snapshot.data;
-                return Column(children: <Widget>[
-                  Text('${character?.name}'),
+                return Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Text(
+                        '${character?.name}',
+                          style: TextStyle(
+                            letterSpacing: 2,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.redAccent,
+                          )
+                    ),
+                  ),
+                  SizedBox(height: 30),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                       child: Image(
@@ -169,15 +180,29 @@ class CharacterPage extends MaterialPageRoute<Null> {
                           : LinearProgressIndicator();
                     },
                         fit: BoxFit.cover,
-                    width: 300,
-                    height: 300,
-                    semanticLabel: '${character?.name}',
+                        width: 300,
+                        height: 300,
+                        semanticLabel: '${character?.name}',
                   )
                   ),
-                  Text(
-                    'You are a ${character?.race} '
-                        'from ${character?.origin} '
-                        'and loyal to ${character?.affiliation}'
+                  SizedBox(height: 30),
+                  Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Text(
+                        (character?.affiliation.toLowerCase() == 'rogue')
+                            ? 'You are a ${character?.race} '
+                            'from ${character?.origin}'
+                            ' and loyal to no one'
+                            : 'You are a ${character?.race} '
+                            'from ${character?.origin}'
+                            ' and loyal to ${character?.affiliation}',
+
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.lightBlueAccent[700],
+                      )
+                    ),
                   )
                 ]);
               } else if(snapshot.hasError) {
@@ -192,20 +217,6 @@ class CharacterPage extends MaterialPageRoute<Null> {
     );
   });
 }
-
-
-
-// selectAffiliation(affiliations) {
-//   final thing =  affiliations.sort((a, b) =>
-//     affiliations.where((str) => str == a).length - affiliations.where((str) => str == b).length
-//   )[affiliations.length - 1];
-//   print(thing);
-//   return thing;
-// }
-
-// String selectAffiliation = (List<String> arr) {
-//
-// }
 
 Future<Character> fetchCharacter(affiliation) async {
   final response = await http
