@@ -2,7 +2,7 @@ import '../questionItem.dart';
 
 List<QuestionItem> answers_3 = [
   QuestionItem(
-    answer: 'You stay out of it and focus on your own problems',
+    answer: 'You stay out of it and focus on your own problems.',
     value: 'rogue'
   ),
   QuestionItem(

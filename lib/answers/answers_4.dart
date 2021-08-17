@@ -6,7 +6,7 @@ List<QuestionItem> answers_4 = [
     value: 'romulan'
   ),
   QuestionItem(
-    answer: 'You trust that the world\'s scientific community will come together to find the answer',
+    answer: 'You trust that the world\'s scientific community will come together to find the answer.',
     value: 'federation'
   ),
   QuestionItem(
@@ -18,7 +18,7 @@ List<QuestionItem> answers_4 = [
     value: 'starfleet'
   ),
   QuestionItem(
-    answer: 'Who cares, you\'re armed and ready.... to crush.',
+    answer: 'Who cares, you\'re armed and ready.... for crushing.',
     value: 'klingon'
   ),
 ];

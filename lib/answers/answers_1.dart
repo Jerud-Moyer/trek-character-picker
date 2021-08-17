@@ -18,7 +18,7 @@ List<QuestionItem> answers_1 = [
       value: 'romulan'
   ),
   QuestionItem(
-      answer: 'Not always wanting to be part of a team, you are comfortably a lone-wolf.',
+      answer: 'Don\'t always want to be part of a team, you are comfortably a lone-wolf.',
       value: 'rogue'
   )
 ];

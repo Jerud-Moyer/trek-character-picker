@@ -10,7 +10,7 @@ List<QuestionItem> answers_2 = [
     value: 'rogue'
   ),
   QuestionItem(
-    answer: 'Ignore them as to not alter the course of their unique reality',
+    answer: 'Ignore them as to not alter the course of their unique reality.',
     value: 'starfleet'
   ),
   QuestionItem(

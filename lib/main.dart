@@ -8,6 +8,7 @@ import 'question_widget.dart';
 import 'answers/answers_2.dart';
 import 'answers/answers_3.dart';
 import 'answers/answers_4.dart';
+import 'answers/answers_5.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -29,6 +30,7 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
   String dropdownValue_2 = answers_2[0].value;
   String dropdownValue_3 = answers_3[0].value;
   String dropdownValue_4 = answers_4[0].value;
+  String dropdownValue_5 = answers_5[0].value;
 
   @override
   Widget build(BuildContext ctx) {
@@ -47,7 +49,7 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(ctx, CharacterPage(
-                [dropdownValue_1, dropdownValue_2, dropdownValue_3, dropdownValue_4]
+                [dropdownValue_1, dropdownValue_2, dropdownValue_3, dropdownValue_4, dropdownValue_5]
             ));
           },
           child: Icon(Icons.arrow_right,
@@ -79,6 +81,16 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
                       onChange: (String? newValue) {
                         setState(() {
                           dropdownValue_2 = newValue!;
+                        });
+                      }
+                    ),
+                    QuestionWidget(
+                      question: 'How do you prefer to travel?',
+                      answers: answers_5,
+                      selectedValue: dropdownValue_5,
+                      onChange: (String? newValue) {
+                        setState(() {
+                          dropdownValue_5 = newValue!;
                         });
                       }
                     ),
