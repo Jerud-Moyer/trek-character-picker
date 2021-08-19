@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:screenshot/screenshot.dart';
 import 'dart:math';
 import 'answers/answers_1.dart';
 import 'character.dart';
@@ -126,6 +128,8 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
 
 class CharacterPage extends MaterialPageRoute<Null> {
   CharacterPage(affiliations) : super(builder: (BuildContext ctx) {
+    final _screenshotController = ScreenshotController();
+
     int klingons = 0;
     int federations = 0;
     int starfleets = 0;
@@ -153,78 +157,154 @@ class CharacterPage extends MaterialPageRoute<Null> {
 
     final affiliation = affiliationCounts[0]['name'];
 
+    // _screenshotController
+    //   .captureFromWidget(Container(
+    //
+    // ));
+
     return Scaffold(
         backgroundColor: Colors.grey[850],
         appBar: AppBar(
             backgroundColor: Colors.grey[800],
             elevation: 10,
         ),
-        body: Center(
-          child: FutureBuilder<Character>(
-            future: fetchCharacter(affiliation),
-            builder: (ctx, snapshot){
-              if(snapshot.hasData){
-                final character = snapshot.data;
+        body: SingleChildScrollView(
+          child: Center(
+            child: FutureBuilder<Character>(
+              future: fetchCharacter(affiliation),
+              builder: (ctx, snapshot){
+                if(snapshot.hasData){
+                  final character = snapshot.data;
+                  return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Text(
+                          '${character?.name}',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              letterSpacing: 2,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.redAccent,
+                            )
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                        child: Image(
+                        image: NetworkImage('${character?.imageUrl}'),
+                        loadingBuilder: (ctx, child, progress) {
+                          return progress == null
+                            ? child
+                            : LinearProgressIndicator();
+                      },
+                          fit: BoxFit.cover,
+                          width: 300,
+                          height: 300,
+                          semanticLabel: '${character?.name}',
+                    )
+                    ),
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Text(
+                          (character?.affiliation.toLowerCase() == 'rogue')
+                              ? 'You are a ${character?.race} '
+                              'from ${character?.origin}'
+                              ' and loyal to no one'
+                              : 'You are a ${character?.race} '
+                              'from ${character?.origin}'
+                              ' and loyal to ${character?.affiliation}',
+
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.lightBlueAccent[700],
+                        )
+                      ),
+                    ),
+                        SizedBox(height: 10),
+                        ElevatedButton(
+                            onPressed: () {
+                              var container = Container(
+                                color: Colors.grey[850],
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    SizedBox(height: 100),
+                                    Text(
+                                        'I\'m ${character?.name}',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          letterSpacing: 2,
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.redAccent,
+                                        )
+                                    ),
+                                    SizedBox(height: 20),
+                                    ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Image(
+                                          image: NetworkImage('${character?.imageUrl}'),
+                                          loadingBuilder: (ctx, child, progress) {
+                                            return progress == null
+                                                ? child
+                                                : LinearProgressIndicator();
+                                          },
+                                          fit: BoxFit.cover,
+                                          width: 300,
+                                          height: 300,
+                                          semanticLabel: '${character?.name}',
+                                        )
+                                    ),
+                                    SizedBox(height: 20),
+                                    Text(
+                                        'who are you?',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          letterSpacing: 2,
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.redAccent,
+                                        )
+                                    ),
+                                  ]
+                                )
+                              );
+                              _screenshotController
+                                .captureFromWidget(
+                                  InheritedTheme.captureAll(
+                                      ctx, Material(child: container)),
+                                      delay: Duration(seconds: 1))
+                                .then((capturedImage) {
+                                  showCapturedWidget(ctx, capturedImage);
+                              });
+                            },
+                            child: Icon(
+                                Icons.share,
+                                color: Colors.amberAccent,
+                            )
+                        ),
+                  ]);
+                } else if(snapshot.hasError) {
+                  return Text("${snapshot.error.toString()}");
+                }
+
                 return Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Text(
-                        '${character?.name}',
-                          style: TextStyle(
-                            letterSpacing: 2,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.redAccent,
-                          )
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                      child: Image(
-                      image: NetworkImage('${character?.imageUrl}'),
-                      loadingBuilder: (ctx, child, progress) {
-                        return progress == null
-                          ? child
-                          : LinearProgressIndicator();
-                    },
-                        fit: BoxFit.cover,
-                        width: 300,
-                        height: 300,
-                        semanticLabel: '${character?.name}',
-                  )
-                  ),
-                  SizedBox(height: 30),
-                  Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Text(
-                        (character?.affiliation.toLowerCase() == 'rogue')
-                            ? 'You are a ${character?.race} '
-                            'from ${character?.origin}'
-                            ' and loyal to no one'
-                            : 'You are a ${character?.race} '
-                            'from ${character?.origin}'
-                            ' and loyal to ${character?.affiliation}',
-
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.lightBlueAccent[700],
-                      )
-                    ),
-                  )
-                ]);
-              } else if(snapshot.hasError) {
-                return Text("${snapshot.error.toString()}");
+                      SizedBox(height: 250),
+                      CircularProgressIndicator()
+                    ]
+                );
               }
+            )
 
-              return CircularProgressIndicator();
-            }
-          )
-
+          ),
         )
     );
   });
@@ -246,5 +326,29 @@ Future<Character> fetchCharacter(affiliation) async {
   } else {
     throw Exception('Failed to load character');
   }
+}
+
+Future<dynamic> showCapturedWidget(
+  BuildContext context, Uint8List capturedImage) {
+  return showDialog(
+    useSafeArea: false,
+    context: context,
+    builder: (context) => Scaffold(
+        backgroundColor: Colors.grey[850],
+      appBar: AppBar(
+        backgroundColor: Colors.grey[600],
+        elevation: 20,
+        title: Text(
+            'Which Trek character am I?',
+            style: TextStyle(
+                color: Colors.amber
+            ),
+        ),
+      ),
+      body: Center(
+        child: Image.memory(capturedImage)
+      )
+    )
+  );
 }
 
