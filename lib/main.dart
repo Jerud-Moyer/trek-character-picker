@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -45,7 +46,8 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
           title: Text(
               'Which Trek Character Are You?',
               style: TextStyle(
-                  color: Colors.amber)
+                  color: Colors.amber
+              )
           ),
           centerTitle: true,
           backgroundColor: Colors.grey[800],
@@ -205,8 +207,9 @@ class CharacterPage extends MaterialPageRoute<Null> {
                     ),
                         SizedBox(height: 10),
                         ElevatedButton(
-                            onPressed: () {
-                              var container = ShareableWidget(character: character);
+                            onPressed: (kIsWeb) ? () {
+                                  showAlertDialog(ctx); }
+                                  : () { var container = ShareableWidget(character: character);
                               _screenshotController
                                 .captureFromWidget(
                                   InheritedTheme.captureAll(
@@ -239,6 +242,34 @@ class CharacterPage extends MaterialPageRoute<Null> {
         )
     );
   }
+  );
+}
+
+void showAlertDialog(BuildContext context) {
+
+  Widget okButton = TextButton(
+    child: Text('OK'),
+    onPressed: () { Navigator.pop(context); },
+  );
+
+  AlertDialog alert = AlertDialog(
+    title: Text(
+        'Sorry!',
+         textAlign: TextAlign.center,
+    ),
+    content: Text('Sharing not available for web. Download the mobile app today!'),
+    elevation: 30,
+    backgroundColor: Colors.grey[300],
+    actions: [
+      okButton,
+    ],
+  );
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
   );
 }
 
