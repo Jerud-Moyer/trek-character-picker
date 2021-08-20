@@ -1,9 +1,10 @@
-import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
-import 'dart:math';
+import 'package:share_plus/share_plus.dart';
+import 'package:trek_character_picker/shareable_widget.dart';
 import 'answers/answers_1.dart';
 import 'character.dart';
 import 'question_widget.dart';
@@ -11,6 +12,8 @@ import 'answers/answers_2.dart';
 import 'answers/answers_3.dart';
 import 'answers/answers_4.dart';
 import 'answers/answers_5.dart';
+import 'affiliationCount.dart';
+import './api.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -61,7 +64,7 @@ class _TrekCharacterPickerState extends State<TrekCharacterPicker> {
           backgroundColor: Colors.grey[800],
         ),
         body: Padding(
-            padding: EdgeInsets.fromLTRB(30, 40, 30, 0),
+            padding: EdgeInsets.fromLTRB(30, 30, 30, 0),
             child: SingleChildScrollView(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,37 +133,10 @@ class CharacterPage extends MaterialPageRoute<Null> {
   CharacterPage(affiliations) : super(builder: (BuildContext ctx) {
     final _screenshotController = ScreenshotController();
 
-    int klingons = 0;
-    int federations = 0;
-    int starfleets = 0;
-    int romulans = 0;
-    int rogues = 0;
-
-    affiliations.forEach((word) => {
-      if(word == 'klingon') {klingons += 1},
-      if(word == 'federation') {federations += 1},
-      if(word == 'starfleet') {starfleets += 1},
-      if(word == 'romulan') {romulans += 1},
-      if(word == 'rogue') {rogues += 1}
-    });
-
-    List<Map<String, dynamic>> affiliationCounts = [
-      {'name' : 'klingon', 'amt' : klingons},
-      {'name' : 'federation', 'amt' : federations},
-      {'name' : 'starfleet', 'amt' : starfleets},
-      {'name' : 'romulan', 'amt' : romulans},
-      {'name' : 'rogue', 'amt' : rogues}
-    ];
-
+    final affiliationCounts = affiliationCount(affiliations);
     affiliationCounts.shuffle();
     affiliationCounts.sort((a, b) => b['amt'] - a['amt']);
-
     final affiliation = affiliationCounts[0]['name'];
-
-    // _screenshotController
-    //   .captureFromWidget(Container(
-    //
-    // ));
 
     return Scaffold(
         backgroundColor: Colors.grey[850],
@@ -210,7 +186,7 @@ class CharacterPage extends MaterialPageRoute<Null> {
                     ),
                     SizedBox(height: 30),
                     Padding(
-                      padding: const EdgeInsets.all(14.0),
+                      padding: EdgeInsets.all(14.0),
                       child: Text(
                           (character?.affiliation.toLowerCase() == 'rogue')
                               ? 'You are a ${character?.race} '
@@ -230,52 +206,7 @@ class CharacterPage extends MaterialPageRoute<Null> {
                         SizedBox(height: 10),
                         ElevatedButton(
                             onPressed: () {
-                              var container = Container(
-                                color: Colors.grey[850],
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    SizedBox(height: 100),
-                                    Text(
-                                        'I\'m ${character?.name}',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          letterSpacing: 2,
-                                          fontSize: 25,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.redAccent,
-                                        )
-                                    ),
-                                    SizedBox(height: 20),
-                                    ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: Image(
-                                          image: NetworkImage('${character?.imageUrl}'),
-                                          loadingBuilder: (ctx, child, progress) {
-                                            return progress == null
-                                                ? child
-                                                : LinearProgressIndicator();
-                                          },
-                                          fit: BoxFit.cover,
-                                          width: 300,
-                                          height: 300,
-                                          semanticLabel: '${character?.name}',
-                                        )
-                                    ),
-                                    SizedBox(height: 20),
-                                    Text(
-                                        'who are you?',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          letterSpacing: 2,
-                                          fontSize: 25,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.redAccent,
-                                        )
-                                    ),
-                                  ]
-                                )
-                              );
+                              var container = ShareableWidget(character: character);
                               _screenshotController
                                 .captureFromWidget(
                                   InheritedTheme.captureAll(
@@ -307,29 +238,17 @@ class CharacterPage extends MaterialPageRoute<Null> {
           ),
         )
     );
-  });
-}
-
-Future<Character> fetchCharacter(affiliation) async {
-  final response = await http
-      .get(
-      Uri.parse(
-          'https://trek-dex.herokuapp.com/api/v1/characters/filter?affiliation=$affiliation'
-      )
-  );
-  if (response.statusCode == 200) {
-    final characterList = jsonDecode(response.body);
-    Random random = new Random();
-    int randomIndex = random.nextInt(characterList.length);
-    return Character.fromJson(characterList[randomIndex]);
-
-  } else {
-    throw Exception('Failed to load character');
   }
+  );
 }
 
 Future<dynamic> showCapturedWidget(
-  BuildContext context, Uint8List capturedImage) {
+  BuildContext context, Uint8List capturedImage) async {
+
+    final directory = await getApplicationDocumentsDirectory();
+    final image = File('${directory.path}/flutter.png');
+    image.writeAsBytesSync(capturedImage);
+
   return showDialog(
     useSafeArea: false,
     context: context,
@@ -344,11 +263,34 @@ Future<dynamic> showCapturedWidget(
                 color: Colors.amber
             ),
         ),
+        leading: IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            }
+      ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.grey[600],
+        onPressed: () {
+          Share.shareFiles([image.path], text: "Shared form Trek Character Picker!");
+          },
+        child: Text(
+            'Share!',
+            style: TextStyle(
+              color: Colors.amberAccent,
+            )
+        ),
       ),
       body: Center(
-        child: Image.memory(capturedImage)
-      )
+          child: Image.memory(capturedImage)
+      ),
+
     )
+
   );
+
+
 }
 

@@ -1,4 +1,5 @@
-class AffiliationCount {
+
+List<Map<String, dynamic>> affiliationCount(List<String> affiliations) {
   int klingons = 0;
   int federations = 0;
   int starfleets = 0;
@@ -13,7 +14,7 @@ class AffiliationCount {
   if(word == 'rogue') {rogues += 1}
   });
 
-  List<Map<String, dynamic>> affiliationCounts = [
+ return [
     {'name' : 'klingon', 'amt' : klingons},
     {'name' : 'federation', 'amt' : federations},
     {'name' : 'starfleet', 'amt' : starfleets},
